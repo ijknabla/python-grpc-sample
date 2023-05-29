@@ -38,3 +38,11 @@ repos:
         entry: .venv/bin/pflake8
         language: system
         pass_filenames: false
+    -   id: protoc
+        name: Generate python code by protoc
+        entry: .venv/bin/python
+        args:
+        -   -mgrpc_tools.protoc
+        -   -I.
+        language: system
+        files: .*\.proto
