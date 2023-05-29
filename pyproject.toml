@@ -29,15 +29,17 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.black]
+extend-exclude = "^.*_pb2.*\\.py$"
 line-length = 100
 
 [tool.flake8]
-exclude = '.venv,.git'
+exclude = '.venv,.git,**/*_pb2*.py'
 max-line-length = 100
 
 [tool.isort]
 line_length = 100
 profile = "black"
+skip_glob = "**/*_pb2*.py"
 
 [tool.mypy]
 namespace_packages = true
