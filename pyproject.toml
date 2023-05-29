@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "mine"
+version = "0.0.0"
+description = "Sample gRPC service"
+authors = ["ijknabla <ijknabla@gmail.com>"]
+license = "LICENSE"
+readme = "README.md"
+packages = [
+    {include = "mine"},
+    {include = "mine_client"},
+    {include = "mine_server"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+mypy = "^1.3.0"
+pyproject-flake8 = "^6.0.0.post1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+
+[tool.flake8]
+exclude = '.venv,.git'
+max-line-length = 100
+
+[tool.isort]
+line_length = 100
+profile = "black"
+
+[tool.mypy]
+namespace_packages = true
+explicit_package_bases = true
