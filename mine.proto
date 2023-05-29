@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package Mine;
+
+
+service Mine
+{
+    rpc FizzBuzz(FizzBuzzRequest) returns (FizzBuzzResponse);
+}
+
+message FizzBuzzRequest
+{
+    int32 i = 1;
+}
+
+message FizzBuzzResponse
+{
+    string s = 1;
+}
