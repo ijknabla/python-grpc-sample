@@ -5,6 +5,11 @@ description = "Sample gRPC service"
 authors = ["ijknabla <ijknabla@gmail.com>"]
 license = "LICENSE"
 readme = "README.md"
+packages = [
+    {include = "mine_client"},
+    {include = "mine_common"},
+    {include = "mine_server"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.10"
