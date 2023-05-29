@@ -3,7 +3,7 @@ name = "mine"
 version = "0.0.0"
 description = "Sample gRPC service"
 authors = ["ijknabla <ijknabla@gmail.com>"]
-license = "MIT"
+license = "LICENSE"
 readme = "README.md"
 
 [tool.poetry.dependencies]
