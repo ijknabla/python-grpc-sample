@@ -6,8 +6,8 @@ authors = ["ijknabla <ijknabla@gmail.com>"]
 license = "LICENSE"
 readme = "README.md"
 packages = [
+    {include = "mine"},
     {include = "mine_client"},
-    {include = "mine_common"},
     {include = "mine_server"},
 ]
 
