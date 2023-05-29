@@ -26,6 +26,12 @@ pyproject-flake8 = "^6.0.0.post1"
 grpcio-tools = "^1.54.2"
 types-setuptools = "^67.8.0.0"
 
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.3.1"
+pytest-asyncio = "^0.21.0"
+pytest-grpc = "^0.8.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
