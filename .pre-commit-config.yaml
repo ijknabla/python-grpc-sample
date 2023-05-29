@@ -33,3 +33,8 @@ repos:
         -   .
         language: system
         pass_filenames: false
+    -   id: pflake8
+        name: Check python code by pflake8
+        entry: .venv/bin/pflake8
+        language: system
+        pass_filenames: false
