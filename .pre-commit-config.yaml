@@ -18,3 +18,10 @@ repos:
         -   .
         language: system
         pass_filenames: false
+    -   id: isort
+        name: Format python code by isort
+        entry: .venv/bin/isort
+        args:
+        -   .
+        language: system
+        pass_filenames: false
