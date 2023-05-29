@@ -1,22 +1,34 @@
 import abc
+import enum
+from collections.abc import Sequence as _Sequence
 from concurrent.futures import ThreadPoolExecutor as _ThreadPoolExecutor
 from threading import Event as _Event
+
+from ._typing import ChannelArgumentType as _ChannelArgumentType
 
 class RpcContext(abc.ABC): ...
 class Channel(abc.ABC): ...
 class ServicerContext(RpcContext, metaclass=abc.ABCMeta): ...
+class GenericRpcHandler(abc.ABC): ...
 
 class Server(abc.ABC):
     def add_insecure_port(self, address: str) -> int: ...
     def start(self) -> None: ...
     def stop(self, grace: float | None) -> _Event: ...
 
+class ServerInterceptor(abc.ABC): ...
+
 def server(
     thread_pool: _ThreadPoolExecutor,
-    handlers: None = None,
-    interceptors: None = None,
-    options: None = None,
-    maximum_concurrent_rpcs: None = None,
-    compression: None = None,
+    handlers: _Sequence[GenericRpcHandler] | None = None,
+    interceptors: _Sequence[ServerInterceptor] | None = None,
+    options: _Sequence[_ChannelArgumentType] | None = None,
+    maximum_concurrent_rpcs: int | None = None,
+    compression: Compression | None = None,
     xds: bool = False,
 ) -> Server: ...
+@enum.unique
+class Compression(enum.IntEnum):
+    NoCompression = ...
+    Deflate = ...
+    Gzip = ...
