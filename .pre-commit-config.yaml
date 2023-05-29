@@ -44,5 +44,7 @@ repos:
         args:
         -   -mgrpc_tools.protoc
         -   -I.
+        -   --python_out=mine/_proto
+        -   --grpc_python_out=mine/_proto
         language: system
         files: .*\.proto
