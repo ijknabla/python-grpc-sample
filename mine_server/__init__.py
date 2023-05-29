@@ -1,4 +1,4 @@
-from collections.abc import Generator
+from collections.abc import Generator, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 
@@ -7,7 +7,7 @@ from grpc import server as grpc_server
 
 from mine.rpc import MineServicer as MineServicerBase
 from mine.rpc import add_MineServicer_to_server
-from mine.types import FizzBuzzRequest, FizzBuzzResponse
+from mine.types import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
 
 
 class MineServicer(MineServicerBase):
@@ -18,6 +18,10 @@ class MineServicer(MineServicerBase):
         if request.i % 5 == 0:
             response.s += "Buzz"
         return response
+
+    def Count(self, request: CountRequest, context: ServicerContext) -> Iterator[CountResponse]:
+        for i in range(request.n):
+            yield CountResponse(i=i)
 
 
 @contextmanager
