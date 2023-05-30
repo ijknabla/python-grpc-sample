@@ -1,4 +1,5 @@
 import re
+from collections.abc import AsyncIterator
 
 import pytest
 
@@ -43,3 +44,19 @@ async def _test_any_count(stub: SupportsMineStub) -> None:
     request = UnsignedInteger(u=u)
     responses = [r async for r in stub.Count(request)]
     assert [r.u for r in responses] == list(range(u))
+
+
+@pytest.mark.asyncio
+async def test_async_sum(grpc_aio_stub: SupportsMineStub) -> None:
+    await _test_any_sum(grpc_aio_stub)
+
+
+async def _test_any_sum(stub: SupportsMineStub) -> None:
+    us = range(100)
+
+    async def values_iterator() -> AsyncIterator[UnsignedInteger]:
+        for u in us:
+            yield UnsignedInteger(u=u)
+
+    response = await stub.Sum(values_iterator())
+    assert sum(us) == response.u

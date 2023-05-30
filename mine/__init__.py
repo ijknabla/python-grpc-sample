@@ -56,6 +56,11 @@ if TYPE_CHECKING:
         ) -> Iterable[UnsignedInteger]:
             ...
 
+        def Sum(
+            self, request: Iterable[UnsignedInteger], context: grpc.ServicerContext
+        ) -> UnsignedInteger:
+            ...
+
     class AsyncMineServicer(Protocol):
         async def FizzBuzz(
             self,
@@ -69,6 +74,13 @@ if TYPE_CHECKING:
             request: UnsignedInteger,
             context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
         ) -> AsyncIterable[UnsignedInteger]:
+            ...
+
+        async def Sum(
+            self,
+            request: AsyncIterable[UnsignedInteger],
+            context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+        ) -> UnsignedInteger:
             ...
 
 else:

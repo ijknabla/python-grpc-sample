@@ -1,4 +1,4 @@
-from collections.abc import AsyncIterator, Generator, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Generator, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 
@@ -25,6 +25,14 @@ class MineServicer(_MineServicerBase):
         for u in range(request.u):
             yield UnsignedInteger(u=u)
 
+    def Sum(
+        self, requests: Iterable[UnsignedInteger], context: grpc.ServicerContext
+    ) -> UnsignedInteger:
+        response = UnsignedInteger()
+        for request in requests:
+            response.u += request.u
+        return response
+
 
 class AsyncMineServicer(_AsyncMineServicerBase):
     async def FizzBuzz(
@@ -46,6 +54,16 @@ class AsyncMineServicer(_AsyncMineServicerBase):
     ) -> AsyncIterator[UnsignedInteger]:
         for u in range(request.u):
             yield UnsignedInteger(u=u)
+
+    async def Sum(
+        self,
+        requests: AsyncIterable[UnsignedInteger],
+        context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+    ) -> UnsignedInteger:
+        response = UnsignedInteger()
+        async for request in requests:
+            response.u += request.u
+        return response
 
 
 @contextmanager
