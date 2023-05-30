@@ -10,7 +10,7 @@ __all__ = (
     "add_MineServicer_to_server",
 )
 
-from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterator
+from collections.abc import AsyncIterable, Awaitable, Iterable, Iterator
 from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
@@ -48,7 +48,7 @@ if TYPE_CHECKING:
 
         def Count(
             self, request: CountRequest, context: grpc.ServicerContext
-        ) -> Iterator[CountResponse]:
+        ) -> Iterable[CountResponse]:
             ...
 
     class AsyncMineServicer(Protocol):
@@ -59,11 +59,11 @@ if TYPE_CHECKING:
         ) -> FizzBuzzResponse:
             ...
 
-        async def Count(
+        def Count(
             self,
             request: CountRequest,
             context: grpc.aio.ServicerContext[CountRequest, CountResponse],
-        ) -> AsyncIterator[CountResponse]:
+        ) -> AsyncIterable[CountResponse]:
             ...
 
 else:
