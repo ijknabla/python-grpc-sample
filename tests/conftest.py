@@ -62,6 +62,6 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[MineStub]:
 
 @fixture(scope="module")
 async def grpc_aio_stub(
-    grpc_stub_cls: type[AsyncMineStub], grpc_aio_channel: grpc.Channel
+    grpc_stub_cls: type[AsyncMineStub], grpc_aio_channel: grpc.aio.Channel
 ) -> AsyncGenerator[AsyncMineStub, None]:
     yield grpc_stub_cls(grpc_aio_channel)
