@@ -23,10 +23,9 @@ from mine import (
     FizzBuzzRequest,
     FizzBuzzResponse,
     MineStub,
-    SupportsAddMineServicerToServer,
     add_MineServicer_to_server,
 )
-from mine_server import MineServicer
+from mine_server import AsyncMineServicer
 
 from . import SupportsMineStub
 
@@ -43,6 +42,7 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
         loop.close()
 
 
+"""
 @fixture(scope="module")
 def grpc_add_to_server() -> SupportsAddMineServicerToServer:
     return add_MineServicer_to_server
@@ -51,6 +51,21 @@ def grpc_add_to_server() -> SupportsAddMineServicerToServer:
 @fixture(scope="module")
 def grpc_servicer() -> MineServicer:
     return MineServicer()
+"""
+
+
+@fixture(scope="module")
+async def grpc_server(grpc_addr: str) -> AsyncGenerator[grpc.aio.Server, None]:
+    server = grpc.aio.server()
+    add_MineServicer_to_server(AsyncMineServicer(), server)
+    server.add_insecure_port(grpc_addr)
+
+    await server.start()
+    try:
+        yield server
+    finally:
+        await server.stop(None)
+        await server.wait_for_termination()
 
 
 class AsyncCreateChannel(Protocol):
