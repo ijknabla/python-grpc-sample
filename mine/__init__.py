@@ -29,6 +29,9 @@ if TYPE_CHECKING:
         def Count(self, request: UnsignedInteger) -> Iterator[UnsignedInteger]:
             ...
 
+        def Sum(self, request: Iterable[UnsignedInteger]) -> UnsignedInteger:
+            ...
+
     class AsyncMineStub(object):
         def __init__(self, channel: grpc.aio.Channel) -> None:
             ...
@@ -37,6 +40,9 @@ if TYPE_CHECKING:
             ...
 
         def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
+            ...
+
+        def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
             ...
 
     class MineServicer(Protocol):
