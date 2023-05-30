@@ -1,16 +1,14 @@
 from collections.abc import Iterator as _Iterator
+from typing import Protocol as _Protocol
 
 import grpc
-from grpc._channel import _MultiThreadedRendezvous
 
 from . import mine_pb2 as mine__pb2
 
-class MineStub(object):
+class MineStub(_Protocol):
     def __init__(self, channel: grpc.Channel) -> None: ...
     def FizzBuzz(self, request: mine__pb2.FizzBuzzRequest) -> mine__pb2.FizzBuzzResponse: ...
-    def Count(
-        self, request: mine__pb2.CountRequest
-    ) -> _MultiThreadedRendezvous[mine__pb2.CountResponse]: ...
+    def Count(self, request: mine__pb2.CountRequest) -> _Iterator[mine__pb2.CountResponse]: ...
 
 class MineServicer(object):
     def FizzBuzz(
