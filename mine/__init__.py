@@ -66,10 +66,20 @@ if TYPE_CHECKING:
             ...
 
 else:
-    from ._proto.mine_pb2_grpc import MineServicer as AsyncMineServicer
-    from ._proto.mine_pb2_grpc import MineServicer as MineServicer
-    from ._proto.mine_pb2_grpc import MineStub as AsyncMineStub
-    from ._proto.mine_pb2_grpc import MineStub as MineStub
+    from ._proto.mine_pb2_grpc import MineServicer as _MineServicerBase
+    from ._proto.mine_pb2_grpc import MineStub as _MineStubBase
+
+    class MineServicer(_MineServicerBase):
+        ...
+
+    class AsyncMineServicer(_MineServicerBase):
+        ...
+
+    class MineStub(_MineStubBase):
+        ...
+
+    class AsyncMineStub(_MineStubBase):
+        ...
 
 
 class SupportsAddMineServicerToServer(Protocol):
