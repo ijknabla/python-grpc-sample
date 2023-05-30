@@ -1,6 +1,5 @@
 from asyncio import AbstractEventLoop, get_event_loop_policy
 from collections.abc import AsyncGenerator, Callable, Generator
-from contextlib import AbstractAsyncContextManager
 from typing import Protocol
 
 import grpc.aio
@@ -31,7 +30,7 @@ def grpc_servicer() -> MineServicer:
 
 
 class AsyncCreateChannel(Protocol):
-    def __call__(self) -> AbstractAsyncContextManager[grpc.Channel]:
+    def __call__(self) -> grpc.aio.Channel:
         ...
 
 
@@ -42,8 +41,8 @@ def grpc_aio_create_channel(
     def _create_channel(
         # credentials=None,
         # options=None,
-    ) -> AbstractAsyncContextManager[grpc.Channel]:
-        return grpc.aio.insecure_channel(grpc_addr)  # type: ignore
+    ) -> grpc.aio.Channel:
+        return grpc.aio.insecure_channel(grpc_addr)
 
     return _create_channel
 
@@ -51,7 +50,7 @@ def grpc_aio_create_channel(
 @fixture(scope="module")
 async def grpc_aio_channel(
     grpc_addr: str, grpc_aio_create_channel: AsyncCreateChannel
-) -> AsyncGenerator[grpc.Channel, None]:
+) -> AsyncGenerator[grpc.aio.Channel, None]:
     async with grpc_aio_create_channel() as channel:
         yield channel
 
