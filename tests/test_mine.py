@@ -1,11 +1,20 @@
 import re
-from collections.abc import Awaitable
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterable
+from typing import TypeVar
 
 import pytest
 
-from mine.pb2 import AsyncMineStub, CountRequest, FizzBuzzRequest, FizzBuzzResponse, MineStub
+from mine.pb2 import (
+    AsyncMineStub,
+    CountRequest,
+    CountResponse,
+    FizzBuzzRequest,
+    FizzBuzzResponse,
+    MineStub,
+)
 
 AnyMineStub = MineStub | AsyncMineStub
+T = TypeVar("T")
 
 
 @pytest.mark.asyncio
@@ -37,8 +46,26 @@ async def _call_fizzbuzz(stub: AnyMineStub, request: FizzBuzzRequest) -> FizzBuz
         return response
 
 
-def test_count(grpc_stub: MineStub) -> None:
+@pytest.mark.asyncio
+async def test_count(grpc_stub: MineStub) -> None:
+    await _test_any_count(grpc_stub)
+
+
+async def _test_any_count(stub: AnyMineStub) -> None:
     n = 3
     request = CountRequest(n=n)
-    responses = list(grpc_stub.Count(request))
+    responses = [r async for r in _call_count(stub, request)]
     assert [r.i for r in responses] == list(range(n))
+
+
+def _call_count(stub: AnyMineStub, request: CountRequest) -> AsyncIterable[CountResponse]:
+    responses = stub.Count(request)
+    if isinstance(responses, AsyncIterable):
+        return responses
+    else:
+        return _iter_async(responses)
+
+
+async def _iter_async(iterable: Iterable[T]) -> AsyncIterator[T]:
+    for item in iterable:
+        yield item
