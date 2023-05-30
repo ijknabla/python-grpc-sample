@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from asyncio import AbstractEventLoop, get_event_loop_policy, get_running_loop
-from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Generator
-from dataclasses import dataclass
+from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Generator, Iterator
 from typing import Protocol, TypeVar
 
 import grpc.aio
@@ -21,24 +20,10 @@ from mine import (
 )
 from mine_server import MineServicer
 
-T = TypeVar("T")
+from . import SupportsMineStub
 
-
-@dataclass(frozen=True)
-class MineStubWrapper:
-    stub: MineStub
-
-    @staticmethod
-    def run(f: Callable[[], T]) -> Awaitable[T]:
-        return get_running_loop().run_in_executor(None, f)
-
-    def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
-        return self.run(lambda: self.stub.FizzBuzz(request))
-
-    async def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
-        responses = await self.run(lambda: list(self.stub.Count(request)))
-        for response in responses:
-            yield response
+T_request = TypeVar("T_request")
+T_response = TypeVar("T_response")
 
 
 @fixture(scope="session")
@@ -93,12 +78,44 @@ async def grpc_aio_channel(
 
 
 @fixture(scope="module")
-def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[MineStub]:
-    return MineStub
+def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
+    class MineStubWrapper:
+        stub: MineStub
+
+        def __init__(self, channel: grpc.Channel) -> None:
+            self.stub = MineStub(channel)
+
+        @staticmethod
+        def __unary_unary(
+            f: Callable[[T_request], T_response], request: T_request
+        ) -> Awaitable[T_response]:
+            return get_running_loop().run_in_executor(None, lambda: f(request))
+
+        @staticmethod
+        async def __unary_stream(
+            f: Callable[[T_request], Iterator[T_response]], request: T_request
+        ) -> AsyncIterable[T_response]:
+            responses = await get_running_loop().run_in_executor(None, lambda: list(f(request)))
+            for response in responses:
+                yield response
+
+        def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
+            return self.__unary_unary(self.stub.FizzBuzz, request)
+
+        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+            return self.__unary_stream(self.stub.Count, request)
+
+    return MineStubWrapper
+
+
+@fixture(scope="module")
+def grpc_aio_stub_cls(grpc_channel: grpc.Channel) -> Callable[[grpc.aio.Channel], SupportsMineStub]:
+    return AsyncMineStub
 
 
 @fixture(scope="module")
 async def grpc_aio_stub(
-    grpc_stub_cls: type[AsyncMineStub], grpc_aio_channel: grpc.aio.Channel
-) -> AsyncGenerator[AsyncMineStub, None]:
-    yield grpc_stub_cls(grpc_aio_channel)
+    grpc_aio_stub_cls: Callable[[grpc.aio.Channel], SupportsMineStub],
+    grpc_aio_channel: grpc.aio.Channel,
+) -> AsyncGenerator[SupportsMineStub, None]:
+    yield grpc_aio_stub_cls(grpc_aio_channel)

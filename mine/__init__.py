@@ -9,6 +9,7 @@ __all__ = (
     "MineStub",
     "add_MineServicer_to_server",
 )
+
 from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterator
 from typing import TYPE_CHECKING, Protocol, overload
 
