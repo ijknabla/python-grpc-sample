@@ -9,7 +9,7 @@ __all__ = (
     "add_MineServicer_to_server",
 )
 from collections.abc import AsyncIterable, Awaitable, Iterator
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Protocol
 
 import grpc.aio
 
@@ -41,3 +41,9 @@ if TYPE_CHECKING:
 else:
     from ._proto.mine_pb2_grpc import MineStub as AsyncMineStub
     from ._proto.mine_pb2_grpc import MineStub as MineStub
+
+
+class SupportsAddMineServicerToServer(Protocol):
+    @staticmethod
+    def __call__(servicer: MineServicer, server: grpc.Server) -> None:
+        ...
