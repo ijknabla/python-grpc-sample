@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Protocol
 import grpc.aio
 
 from ._proto.mine_pb2 import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
-from ._proto.mine_pb2_grpc import MineServicer, add_MineServicer_to_server
+from ._proto.mine_pb2_grpc import add_MineServicer_to_server
 
 if TYPE_CHECKING:
 
@@ -38,7 +38,19 @@ if TYPE_CHECKING:
         def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
             ...
 
+    class MineServicer(Protocol):
+        def FizzBuzz(
+            self, request: FizzBuzzRequest, context: grpc.ServicerContext
+        ) -> FizzBuzzResponse:
+            ...
+
+        def Count(
+            self, request: CountRequest, context: grpc.ServicerContext
+        ) -> Iterator[CountResponse]:
+            ...
+
 else:
+    from ._proto.mine_pb2_grpc import MineServicer as MineServicer
     from ._proto.mine_pb2_grpc import MineStub as AsyncMineStub
     from ._proto.mine_pb2_grpc import MineStub as MineStub
 
