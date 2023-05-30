@@ -27,12 +27,11 @@ from pytest_asyncio import fixture
 
 from mine import (
     AsyncMineStub,
-    CountRequest,
-    CountResponse,
     FizzBuzzRequest,
     FizzBuzzResponse,
     MineStub,
     SupportsAddMineServicerToServer,
+    UnsignedInteger,
     add_MineServicer_to_server,
 )
 from mine_server import AsyncMineServicer
@@ -139,7 +138,7 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
         def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
             return self.__unary_unary(self.stub.FizzBuzz, request)
 
-        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+        def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
             return self.__unary_stream(self.stub.Count, request)
 
         @staticmethod

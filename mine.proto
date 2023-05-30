@@ -6,7 +6,7 @@ package Mine;
 service Mine
 {
     rpc FizzBuzz(FizzBuzzRequest) returns (FizzBuzzResponse);
-    rpc Count(CountRequest) returns (stream CountResponse);
+    rpc Count(UnsignedInteger) returns (stream UnsignedInteger);
 }
 
 message FizzBuzzRequest
@@ -19,12 +19,7 @@ message FizzBuzzResponse
     string s = 1;
 }
 
-message CountRequest
+message UnsignedInteger
 {
-    uint32 n = 1;
-}
-
-message CountResponse
-{
-    uint32 i = 1;
+    int32 u = 1;
 }

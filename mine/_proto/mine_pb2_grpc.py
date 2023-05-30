@@ -21,8 +21,8 @@ class MineStub(object):
                 )
         self.Count = channel.unary_stream(
                 '/Mine.Mine/Count',
-                request_serializer=mine__pb2.CountRequest.SerializeToString,
-                response_deserializer=mine__pb2.CountResponse.FromString,
+                request_serializer=mine__pb2.UnsignedInteger.SerializeToString,
+                response_deserializer=mine__pb2.UnsignedInteger.FromString,
                 )
 
 
@@ -51,8 +51,8 @@ def add_MineServicer_to_server(servicer, server):
             ),
             'Count': grpc.unary_stream_rpc_method_handler(
                     servicer.Count,
-                    request_deserializer=mine__pb2.CountRequest.FromString,
-                    response_serializer=mine__pb2.CountResponse.SerializeToString,
+                    request_deserializer=mine__pb2.UnsignedInteger.FromString,
+                    response_serializer=mine__pb2.UnsignedInteger.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -93,7 +93,7 @@ class Mine(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_stream(request, target, '/Mine.Mine/Count',
-            mine__pb2.CountRequest.SerializeToString,
-            mine__pb2.CountResponse.FromString,
+            mine__pb2.UnsignedInteger.SerializeToString,
+            mine__pb2.UnsignedInteger.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

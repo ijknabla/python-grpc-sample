@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from mine import CountRequest, FizzBuzzRequest
+from mine import FizzBuzzRequest, UnsignedInteger
 
 from . import SupportsMineStub
 
@@ -39,7 +39,7 @@ async def test_async_count(grpc_aio_stub: SupportsMineStub) -> None:
 
 
 async def _test_any_count(stub: SupportsMineStub) -> None:
-    n = 3
-    request = CountRequest(n=n)
+    u = 3
+    request = UnsignedInteger(u=u)
     responses = [r async for r in stub.Count(request)]
-    assert [r.i for r in responses] == list(range(n))
+    assert [r.u for r in responses] == list(range(u))

@@ -5,9 +5,9 @@ from contextlib import contextmanager
 import grpc
 
 from mine import AsyncMineServicer as _AsyncMineServicerBase
-from mine import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
+from mine import FizzBuzzRequest, FizzBuzzResponse
 from mine import MineServicer as _MineServicerBase
-from mine import add_MineServicer_to_server
+from mine import UnsignedInteger, add_MineServicer_to_server
 
 
 class MineServicer(_MineServicerBase):
@@ -20,10 +20,10 @@ class MineServicer(_MineServicerBase):
         return response
 
     def Count(
-        self, request: CountRequest, context: grpc.ServicerContext
-    ) -> Iterator[CountResponse]:
-        for i in range(request.n):
-            yield CountResponse(i=i)
+        self, request: UnsignedInteger, context: grpc.ServicerContext
+    ) -> Iterator[UnsignedInteger]:
+        for u in range(request.u):
+            yield UnsignedInteger(u=u)
 
 
 class AsyncMineServicer(_AsyncMineServicerBase):
@@ -40,10 +40,12 @@ class AsyncMineServicer(_AsyncMineServicerBase):
         return response
 
     async def Count(
-        self, request: CountRequest, context: grpc.aio.ServicerContext[CountRequest, CountResponse]
-    ) -> AsyncIterator[CountResponse]:
-        for i in range(request.n):
-            yield CountResponse(i=i)
+        self,
+        request: UnsignedInteger,
+        context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+    ) -> AsyncIterator[UnsignedInteger]:
+        for u in range(request.u):
+            yield UnsignedInteger(u=u)
 
 
 @contextmanager
