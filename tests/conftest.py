@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from asyncio import AbstractEventLoop, get_event_loop_policy, get_running_loop
+from asyncio import (
+    FIRST_COMPLETED,
+    AbstractEventLoop,
+    Queue,
+    create_task,
+    get_event_loop_policy,
+    get_running_loop,
+    wait,
+)
 from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Generator, Iterator
 from typing import Protocol, TypeVar
 
@@ -95,6 +103,30 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
         async def __unary_stream(
             f: Callable[[T_request], Iterator[T_response]], request: T_request
         ) -> AsyncIterable[T_response]:
+            q = Queue[T_response]()
+
+            def put() -> None:
+                for response in f(request):
+                    q.put_nowait(response)
+
+            async def put_and_join() -> None:
+                await get_running_loop().run_in_executor(None, put)
+                await q.join()
+
+            put_and_join_task = create_task(put_and_join())
+
+            while True:
+                get_task = create_task(q.get())
+                done, _ = await wait([put_and_join_task, get_task], return_when=FIRST_COMPLETED)
+                if done == {get_task}:
+                    yield get_task.result()
+                    q.task_done()
+                elif done == {put_and_join_task}:
+                    get_task.cancel()
+                    return
+                else:
+                    raise NotImplementedError()
+
             responses = await get_running_loop().run_in_executor(None, lambda: list(f(request)))
             for response in responses:
                 yield response
