@@ -2,8 +2,7 @@ from asyncio import AbstractEventLoop, get_event_loop_policy
 from collections.abc import AsyncGenerator, Callable, Generator
 from contextlib import AbstractAsyncContextManager
 
-from grpc import aio  # type: ignore
-from grpc import Channel, Server
+from grpc import Channel, Server, aio
 from pytest import FixtureRequest
 from pytest_asyncio import fixture
 
