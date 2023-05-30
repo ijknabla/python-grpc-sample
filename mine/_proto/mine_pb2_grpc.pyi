@@ -1,3 +1,5 @@
+from collections.abc import AsyncIterator as _AsyncIterator
+from collections.abc import Awaitable as _Awaitable
 from collections.abc import Iterator as _Iterator
 from typing import Protocol as _Protocol
 
@@ -9,6 +11,13 @@ class MineStub(_Protocol):
     def __init__(self, channel: grpc.Channel) -> None: ...
     def FizzBuzz(self, request: mine__pb2.FizzBuzzRequest) -> mine__pb2.FizzBuzzResponse: ...
     def Count(self, request: mine__pb2.CountRequest) -> _Iterator[mine__pb2.CountResponse]: ...
+
+class AsyncMineStub(_Protocol):
+    def __init__(self, channel: grpc.Channel) -> None: ...
+    def FizzBuzz(
+        self, request: mine__pb2.FizzBuzzRequest
+    ) -> _Awaitable[mine__pb2.FizzBuzzResponse]: ...
+    def Count(self, request: mine__pb2.CountRequest) -> _AsyncIterator[mine__pb2.CountResponse]: ...
 
 class MineServicer(object):
     def FizzBuzz(
