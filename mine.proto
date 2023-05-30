@@ -6,6 +6,7 @@ package Mine;
 service Mine
 {
     rpc FizzBuzz(FizzBuzzRequest) returns (FizzBuzzResponse);
+    rpc Count(CountRequest) returns (stream CountResponse);
 }
 
 message FizzBuzzRequest
@@ -16,4 +17,14 @@ message FizzBuzzRequest
 message FizzBuzzResponse
 {
     string s = 1;
+}
+
+message CountRequest
+{
+    uint32 n = 1;
+}
+
+message CountResponse
+{
+    uint32 i = 1;
 }

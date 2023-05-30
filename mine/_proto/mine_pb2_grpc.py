@@ -19,12 +19,23 @@ class MineStub(object):
                 request_serializer=mine__pb2.FizzBuzzRequest.SerializeToString,
                 response_deserializer=mine__pb2.FizzBuzzResponse.FromString,
                 )
+        self.Count = channel.unary_stream(
+                '/Mine.Mine/Count',
+                request_serializer=mine__pb2.CountRequest.SerializeToString,
+                response_deserializer=mine__pb2.CountResponse.FromString,
+                )
 
 
 class MineServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def FizzBuzz(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def Count(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -37,6 +48,11 @@ def add_MineServicer_to_server(servicer, server):
                     servicer.FizzBuzz,
                     request_deserializer=mine__pb2.FizzBuzzRequest.FromString,
                     response_serializer=mine__pb2.FizzBuzzResponse.SerializeToString,
+            ),
+            'Count': grpc.unary_stream_rpc_method_handler(
+                    servicer.Count,
+                    request_deserializer=mine__pb2.CountRequest.FromString,
+                    response_serializer=mine__pb2.CountResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,5 +78,22 @@ class Mine(object):
         return grpc.experimental.unary_unary(request, target, '/Mine.Mine/FizzBuzz',
             mine__pb2.FizzBuzzRequest.SerializeToString,
             mine__pb2.FizzBuzzResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def Count(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_stream(request, target, '/Mine.Mine/Count',
+            mine__pb2.CountRequest.SerializeToString,
+            mine__pb2.CountResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

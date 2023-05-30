@@ -1,7 +1,7 @@
 import re
 
 from mine.rpc import MineStub
-from mine.types import FizzBuzzRequest
+from mine.types import CountRequest, FizzBuzzRequest
 
 
 def test_fizzbuzz(grpc_stub: MineStub) -> None:
@@ -13,3 +13,10 @@ def test_fizzbuzz(grpc_stub: MineStub) -> None:
         fizz, buzz = matched.groups()
         assert (fizz is not None) == (i % 3 == 0)
         assert (buzz is not None) == (i % 5 == 0)
+
+
+def test_count(grpc_stub: MineStub) -> None:
+    n = 3
+    request = CountRequest(n=n)
+    responses = list(grpc_stub.Count(request))
+    assert [r.i for r in responses] == list(range(n))
