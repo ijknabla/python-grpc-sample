@@ -3,7 +3,7 @@ from collections.abc import Callable
 from grpc import Channel, Server
 from pytest import fixture
 
-from mine.rpc import MineStub, add_MineServicer_to_server
+from mine.pb2 import MineStub, add_MineServicer_to_server
 from mine_server import MineServicer
 
 

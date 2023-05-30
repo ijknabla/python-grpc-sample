@@ -6,8 +6,8 @@ from grpc import ServicerContext
 from grpc import server as grpc_server
 
 from mine.pb2 import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
-from mine.rpc import MineServicer as MineServicerBase
-from mine.rpc import add_MineServicer_to_server
+from mine.pb2 import MineServicer as MineServicerBase
+from mine.pb2 import add_MineServicer_to_server
 
 
 class MineServicer(MineServicerBase):
