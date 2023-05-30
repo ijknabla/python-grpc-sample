@@ -4,7 +4,7 @@ from typing import TypeVar
 
 import pytest
 
-from mine.pb2 import (
+from mine import (
     AsyncMineStub,
     CountRequest,
     CountResponse,

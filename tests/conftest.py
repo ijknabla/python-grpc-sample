@@ -8,7 +8,7 @@ import grpc.aio
 from pytest import FixtureRequest
 from pytest_asyncio import fixture
 
-from mine.pb2 import AsyncMineStub, MineStub, add_MineServicer_to_server
+from mine import AsyncMineStub, MineStub, add_MineServicer_to_server
 from mine_server import MineServicer
 
 
