@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 from asyncio import AbstractEventLoop, get_event_loop_policy
-from collections.abc import AsyncGenerator, Callable, Generator
+from collections.abc import AsyncGenerator, Generator
 from typing import Protocol
 
 import grpc.aio
 from pytest import FixtureRequest
 from pytest_asyncio import fixture
 
-from mine import AsyncMineStub, MineStub, add_MineServicer_to_server
+from mine import (
+    AsyncMineStub,
+    MineStub,
+    SupportsAddMineServicerToServer,
+    add_MineServicer_to_server,
+)
 from mine_server import MineServicer
 
 
@@ -22,7 +27,7 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @fixture(scope="module")
-def grpc_add_to_server() -> Callable[[MineServicer, grpc.Server], None]:
+def grpc_add_to_server() -> SupportsAddMineServicerToServer:
     return add_MineServicer_to_server
 
 

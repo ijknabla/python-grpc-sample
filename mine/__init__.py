@@ -10,7 +10,7 @@ __all__ = (
     "add_MineServicer_to_server",
 )
 from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterator
-from typing import TYPE_CHECKING, Protocol
+from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
 
@@ -73,6 +73,12 @@ else:
 
 
 class SupportsAddMineServicerToServer(Protocol):
+    @overload
     @staticmethod
     def __call__(servicer: MineServicer, server: grpc.Server) -> None:
+        ...
+
+    @overload
+    @staticmethod
+    def __call__(servicer: AsyncMineServicer, server: grpc.aio.Server) -> None:
         ...
