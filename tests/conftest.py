@@ -1,6 +1,6 @@
 from asyncio import AbstractEventLoop, get_event_loop_policy
 from collections.abc import AsyncGenerator, Callable, Generator
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
 import grpc.aio
 from pytest import FixtureRequest
@@ -8,6 +8,9 @@ from pytest_asyncio import fixture
 
 from mine.pb2 import AsyncMineStub, MineStub, add_MineServicer_to_server
 from mine_server import MineServicer
+
+if TYPE_CHECKING:
+    from grpc import _Options
 
 
 @fixture(scope="session")
@@ -30,7 +33,10 @@ def grpc_servicer() -> MineServicer:
 
 
 class AsyncCreateChannel(Protocol):
-    def __call__(self) -> grpc.aio.Channel:
+    def __call__(
+        self,
+        options: _Options | None = None,
+    ) -> grpc.aio.Channel:
         ...
 
 
@@ -40,9 +46,10 @@ def grpc_aio_create_channel(
 ) -> AsyncCreateChannel:
     def _create_channel(
         # credentials=None,
-        # options=None,
+        options: _Options
+        | None = None,
     ) -> grpc.aio.Channel:
-        return grpc.aio.insecure_channel(grpc_addr)
+        return grpc.aio.insecure_channel(grpc_addr, options)
 
     return _create_channel
 
