@@ -1,12 +1,15 @@
 from collections.abc import AsyncIterable, Awaitable
 from typing import Protocol
 
-from mine import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
+from mine import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger
 
 
 class SupportsMineStub(Protocol):
     def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
         ...
 
-    def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+    def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
+        ...
+
+    def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
         ...

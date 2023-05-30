@@ -3,8 +3,11 @@ from __future__ import annotations
 from asyncio import (
     FIRST_COMPLETED,
     AbstractEventLoop,
+    Event,
     Queue,
+    QueueEmpty,
     create_task,
+    gather,
     get_event_loop_policy,
     get_running_loop,
     wait,
@@ -15,6 +18,7 @@ from collections.abc import (
     Awaitable,
     Callable,
     Generator,
+    Iterable,
     Iterator,
     Sequence,
 )
@@ -27,12 +31,11 @@ from pytest_asyncio import fixture
 
 from mine import (
     AsyncMineStub,
-    CountRequest,
-    CountResponse,
     FizzBuzzRequest,
     FizzBuzzResponse,
     MineStub,
     SupportsAddMineServicerToServer,
+    UnsignedInteger,
     add_MineServicer_to_server,
 )
 from mine_server import AsyncMineServicer
@@ -139,8 +142,11 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
         def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
             return self.__unary_unary(self.stub.FizzBuzz, request)
 
-        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+        def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
             return self.__unary_stream(self.stub.Count, request)
+
+        def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
+            return self.__stream_unary(self.stub.Sum, request)
 
         @staticmethod
         def __unary_unary(
@@ -175,6 +181,36 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
                     return
                 else:
                     raise NotImplementedError()
+
+        @staticmethod
+        async def __stream_unary(
+            f: Callable[[Iterable[T_request]], T_response], requests: AsyncIterable[T_request]
+        ) -> T_response:
+            done = Event()
+            q = Queue[T_request]()
+
+            async def put_and_join() -> None:
+                nonlocal done
+                async for request in requests:
+                    await q.put(request)
+                await q.join()
+                done.set()
+
+            def iter_request() -> Iterator[T_request]:
+                while not done.is_set():
+                    try:
+                        request = q.get_nowait()
+                    except QueueEmpty:
+                        continue
+                    q.task_done()
+                    yield request
+
+            response, _ = await gather(
+                get_running_loop().run_in_executor(None, lambda: f(iter_request())),
+                put_and_join(),
+            )
+
+            return response
 
     return MineStubWrapper
 

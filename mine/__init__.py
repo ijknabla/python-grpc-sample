@@ -1,12 +1,11 @@
 __all__ = (
     "AsyncMineServicer",
     "AsyncMineStub",
-    "CountRequest",
-    "CountResponse",
     "FizzBuzzRequest",
     "FizzBuzzResponse",
     "MineServicer",
     "MineStub",
+    "UnsignedInteger",
     "add_MineServicer_to_server",
 )
 
@@ -15,7 +14,7 @@ from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
 
-from ._proto.mine_pb2 import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
+from ._proto.mine_pb2 import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger
 from ._proto.mine_pb2_grpc import add_MineServicer_to_server
 
 if TYPE_CHECKING:
@@ -27,7 +26,10 @@ if TYPE_CHECKING:
         def FizzBuzz(self, request: FizzBuzzRequest) -> FizzBuzzResponse:
             ...
 
-        def Count(self, request: CountRequest) -> Iterator[CountResponse]:
+        def Count(self, request: UnsignedInteger) -> Iterator[UnsignedInteger]:
+            ...
+
+        def Sum(self, request: Iterable[UnsignedInteger]) -> UnsignedInteger:
             ...
 
     class AsyncMineStub(object):
@@ -37,7 +39,10 @@ if TYPE_CHECKING:
         def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
             ...
 
-        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+        def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
+            ...
+
+        def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
             ...
 
     class MineServicer(Protocol):
@@ -47,8 +52,13 @@ if TYPE_CHECKING:
             ...
 
         def Count(
-            self, request: CountRequest, context: grpc.ServicerContext
-        ) -> Iterable[CountResponse]:
+            self, request: UnsignedInteger, context: grpc.ServicerContext
+        ) -> Iterable[UnsignedInteger]:
+            ...
+
+        def Sum(
+            self, request: Iterable[UnsignedInteger], context: grpc.ServicerContext
+        ) -> UnsignedInteger:
             ...
 
     class AsyncMineServicer(Protocol):
@@ -61,9 +71,16 @@ if TYPE_CHECKING:
 
         def Count(
             self,
-            request: CountRequest,
-            context: grpc.aio.ServicerContext[CountRequest, CountResponse],
-        ) -> AsyncIterable[CountResponse]:
+            request: UnsignedInteger,
+            context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+        ) -> AsyncIterable[UnsignedInteger]:
+            ...
+
+        async def Sum(
+            self,
+            request: AsyncIterable[UnsignedInteger],
+            context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+        ) -> UnsignedInteger:
             ...
 
 else:

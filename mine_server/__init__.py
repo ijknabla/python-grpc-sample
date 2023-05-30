@@ -1,13 +1,13 @@
-from collections.abc import AsyncIterator, Generator, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Generator, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 
 import grpc
 
 from mine import AsyncMineServicer as _AsyncMineServicerBase
-from mine import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
+from mine import FizzBuzzRequest, FizzBuzzResponse
 from mine import MineServicer as _MineServicerBase
-from mine import add_MineServicer_to_server
+from mine import UnsignedInteger, add_MineServicer_to_server
 
 
 class MineServicer(_MineServicerBase):
@@ -20,10 +20,18 @@ class MineServicer(_MineServicerBase):
         return response
 
     def Count(
-        self, request: CountRequest, context: grpc.ServicerContext
-    ) -> Iterator[CountResponse]:
-        for i in range(request.n):
-            yield CountResponse(i=i)
+        self, request: UnsignedInteger, context: grpc.ServicerContext
+    ) -> Iterator[UnsignedInteger]:
+        for u in range(request.u):
+            yield UnsignedInteger(u=u)
+
+    def Sum(
+        self, requests: Iterable[UnsignedInteger], context: grpc.ServicerContext
+    ) -> UnsignedInteger:
+        response = UnsignedInteger()
+        for request in requests:
+            response.u += request.u
+        return response
 
 
 class AsyncMineServicer(_AsyncMineServicerBase):
@@ -40,10 +48,22 @@ class AsyncMineServicer(_AsyncMineServicerBase):
         return response
 
     async def Count(
-        self, request: CountRequest, context: grpc.aio.ServicerContext[CountRequest, CountResponse]
-    ) -> AsyncIterator[CountResponse]:
-        for i in range(request.n):
-            yield CountResponse(i=i)
+        self,
+        request: UnsignedInteger,
+        context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+    ) -> AsyncIterator[UnsignedInteger]:
+        for u in range(request.u):
+            yield UnsignedInteger(u=u)
+
+    async def Sum(
+        self,
+        requests: AsyncIterable[UnsignedInteger],
+        context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
+    ) -> UnsignedInteger:
+        response = UnsignedInteger()
+        async for request in requests:
+            response.u += request.u
+        return response
 
 
 @contextmanager
