@@ -104,6 +104,20 @@ pycodestyle = ">=2.10.0,<2.11.0"
 pyflakes = ">=3.0.0,<3.1.0"
 
 [[package]]
+name = "grpc-stubs"
+version = "1.53.0.2"
+description = "Mypy stubs for gRPC"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "grpc-stubs-1.53.0.2.tar.gz", hash = "sha256:99cb4fc64d257cd5e402c61ba92fc5ce5f9daf08cc8ee03c112dd2329b4fe3ce"},
+    {file = "grpc_stubs-1.53.0.2-py3-none-any.whl", hash = "sha256:f7ed97a001f2b423c7e7249946ea2bf4a41843a081d693e6cc329df587d61050"},
+]
+
+[package.dependencies]
+grpcio = "*"
+
+[[package]]
 name = "grpcio"
 version = "1.54.2"
 description = "HTTP/2-based RPC framework"
@@ -532,4 +546,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "9ad9d641f59392498be6a3cac4ef3f27e6982140f16763c9a556e2c8b212cd41"
+content-hash = "0351a53a9af66925ac89f1c99a767cbdd3cb939d37d91a16a24e8623086671c7"
