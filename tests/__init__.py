@@ -10,3 +10,6 @@ class SupportsMineStub(Protocol):
 
     def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
         ...
+
+    def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
+        ...
