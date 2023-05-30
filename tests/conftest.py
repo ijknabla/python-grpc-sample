@@ -3,8 +3,7 @@ from collections.abc import AsyncGenerator, Callable, Generator
 from contextlib import AbstractAsyncContextManager
 from typing import Protocol
 
-import grpc
-from grpc import aio
+import grpc.aio
 from pytest import FixtureRequest
 from pytest_asyncio import fixture
 
@@ -44,7 +43,7 @@ def grpc_aio_create_channel(
         # credentials=None,
         # options=None,
     ) -> AbstractAsyncContextManager[grpc.Channel]:
-        return aio.insecure_channel(grpc_addr)  # type: ignore
+        return grpc.aio.insecure_channel(grpc_addr)  # type: ignore
 
     return _create_channel
 
