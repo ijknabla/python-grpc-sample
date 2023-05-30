@@ -193,7 +193,7 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
                 nonlocal done
                 async for request in requests:
                     await q.put(request)
-                    await q.join()
+                await q.join()
                 done.set()
 
             def iter_request() -> Iterator[T_request]:
