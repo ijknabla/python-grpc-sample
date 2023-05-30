@@ -1,36 +1,95 @@
-import asyncio
-import sys
-from collections.abc import Callable, Coroutine, Generator
-from contextlib import contextmanager
-from functools import wraps
-from typing import Any, ParamSpec, TypeVar
+__all__ = (
+    "AsyncMineServicer",
+    "AsyncMineStub",
+    "CountRequest",
+    "CountResponse",
+    "FizzBuzzRequest",
+    "FizzBuzzResponse",
+    "MineServicer",
+    "MineStub",
+    "add_MineServicer_to_server",
+)
 
-from pkg_resources import resource_filename
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterator
+from typing import TYPE_CHECKING, Protocol, overload
 
-_P = ParamSpec("_P")
-_T = TypeVar("_T")
+import grpc.aio
+
+from ._proto.mine_pb2 import CountRequest, CountResponse, FizzBuzzRequest, FizzBuzzResponse
+from ._proto.mine_pb2_grpc import add_MineServicer_to_server
+
+if TYPE_CHECKING:
+
+    class MineStub(object):
+        def __init__(self, channel: grpc.Channel) -> None:
+            ...
+
+        def FizzBuzz(self, request: FizzBuzzRequest) -> FizzBuzzResponse:
+            ...
+
+        def Count(self, request: CountRequest) -> Iterator[CountResponse]:
+            ...
+
+    class AsyncMineStub(object):
+        def __init__(self, channel: grpc.aio.Channel) -> None:
+            ...
+
+        def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
+            ...
+
+        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+            ...
+
+    class MineServicer(Protocol):
+        def FizzBuzz(
+            self, request: FizzBuzzRequest, context: grpc.ServicerContext
+        ) -> FizzBuzzResponse:
+            ...
+
+        def Count(
+            self, request: CountRequest, context: grpc.ServicerContext
+        ) -> Iterator[CountResponse]:
+            ...
+
+    class AsyncMineServicer(Protocol):
+        async def FizzBuzz(
+            self,
+            request: FizzBuzzRequest,
+            context: grpc.aio.ServicerContext[FizzBuzzRequest, FizzBuzzResponse],
+        ) -> FizzBuzzResponse:
+            ...
+
+        async def Count(
+            self,
+            request: CountRequest,
+            context: grpc.aio.ServicerContext[CountRequest, CountResponse],
+        ) -> AsyncIterator[CountResponse]:
+            ...
+
+else:
+    from ._proto.mine_pb2_grpc import MineServicer as _MineServicerBase
+    from ._proto.mine_pb2_grpc import MineStub as _MineStubBase
+
+    class MineServicer(_MineServicerBase):
+        ...
+
+    class AsyncMineServicer(_MineServicerBase):
+        ...
+
+    class MineStub(_MineStubBase):
+        ...
+
+    class AsyncMineStub(_MineStubBase):
+        ...
 
 
-def run(f: Callable[_P, Coroutine[Any, Any, _T]]) -> Callable[_P, _T]:
-    @wraps(f)
-    def wrapped(*args: _P.args, **kwargs: _P.kwargs) -> _T:
-        return asyncio.run(f(*args, **kwargs))
+class SupportsAddMineServicerToServer(Protocol):
+    @overload
+    @staticmethod
+    def __call__(servicer: MineServicer, server: grpc.Server) -> None:
+        ...
 
-    return wrapped
-
-
-@contextmanager
-def push_module_to_path(module: str) -> Generator[None, None, None]:
-    module = resource_filename(module, "")
-
-    if module not in sys.path:
-        sys.path.append(module)
-        pushed = True
-    else:
-        pushed = False
-
-    try:
-        yield
-    finally:
-        if pushed:
-            sys.path.remove(module)
+    @overload
+    @staticmethod
+    def __call__(servicer: AsyncMineServicer, server: grpc.aio.Server) -> None:
+        ...

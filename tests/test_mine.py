@@ -1,36 +1,26 @@
 import re
-from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterable
-from typing import TypeVar
 
 import pytest
 
-from mine.pb2 import (
-    AsyncMineStub,
-    CountRequest,
-    CountResponse,
-    FizzBuzzRequest,
-    FizzBuzzResponse,
-    MineStub,
-)
+from mine import CountRequest, FizzBuzzRequest
 
-AnyMineStub = MineStub | AsyncMineStub
-T = TypeVar("T")
+from . import SupportsMineStub
 
 
 @pytest.mark.asyncio
-async def test_fizzbuzz(grpc_stub: MineStub) -> None:
+async def test_fizzbuzz(grpc_stub: SupportsMineStub) -> None:
     await _test_any_fizzbuzz(grpc_stub)
 
 
 @pytest.mark.asyncio
-async def test_async_fizzbuzz(grpc_aio_stub: AsyncMineStub) -> None:
+async def test_async_fizzbuzz(grpc_aio_stub: SupportsMineStub) -> None:
     await _test_any_fizzbuzz(grpc_aio_stub)
 
 
-async def _test_any_fizzbuzz(stub: AnyMineStub) -> None:
+async def _test_any_fizzbuzz(stub: SupportsMineStub) -> None:
     for i in range(100):
         request = FizzBuzzRequest(i=i)
-        response = await _call_fizzbuzz(stub, request)
+        response = await stub.FizzBuzz(request)
         matched = re.match(r"^(Fizz)?(Buzz)?$", response.s)
         assert matched is not None
         fizz, buzz = matched.groups()
@@ -38,39 +28,18 @@ async def _test_any_fizzbuzz(stub: AnyMineStub) -> None:
         assert (buzz is not None) == (i % 5 == 0)
 
 
-async def _call_fizzbuzz(stub: AnyMineStub, request: FizzBuzzRequest) -> FizzBuzzResponse:
-    response = stub.FizzBuzz(request)
-    if isinstance(response, Awaitable):
-        return await response
-    else:
-        return response
-
-
 @pytest.mark.asyncio
-async def test_count(grpc_stub: MineStub) -> None:
+async def test_count(grpc_stub: SupportsMineStub) -> None:
     await _test_any_count(grpc_stub)
 
 
 @pytest.mark.asyncio
-async def test_async_count(grpc_aio_stub: MineStub) -> None:
+async def test_async_count(grpc_aio_stub: SupportsMineStub) -> None:
     await _test_any_count(grpc_aio_stub)
 
 
-async def _test_any_count(stub: AnyMineStub) -> None:
+async def _test_any_count(stub: SupportsMineStub) -> None:
     n = 3
     request = CountRequest(n=n)
-    responses = [r async for r in _call_count(stub, request)]
+    responses = [r async for r in stub.Count(request)]
     assert [r.i for r in responses] == list(range(n))
-
-
-def _call_count(stub: AnyMineStub, request: CountRequest) -> AsyncIterable[CountResponse]:
-    responses = stub.Count(request)
-    if isinstance(responses, AsyncIterable):
-        return responses
-    else:
-        return _iter_async(responses)
-
-
-async def _iter_async(iterable: Iterable[T]) -> AsyncIterator[T]:
-    for item in iterable:
-        yield item
