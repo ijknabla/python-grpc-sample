@@ -1,6 +1,7 @@
 from asyncio import AbstractEventLoop, get_event_loop_policy
 from collections.abc import AsyncGenerator, Callable, Generator
 from contextlib import AbstractAsyncContextManager
+from typing import Protocol
 
 from grpc import Channel, Server, aio
 from pytest import FixtureRequest
@@ -29,7 +30,9 @@ def grpc_servicer() -> MineServicer:
     return MineServicer()
 
 
-AsyncCreateChannel = Callable[[], AbstractAsyncContextManager[Channel]]
+class AsyncCreateChannel(Protocol):
+    def __call__(self) -> AbstractAsyncContextManager[Channel]:
+        ...
 
 
 @fixture(scope="module")
