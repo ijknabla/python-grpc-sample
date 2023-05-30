@@ -9,8 +9,17 @@ from asyncio import (
     get_running_loop,
     wait,
 )
-from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Generator, Iterator
-from typing import Protocol, TypeVar
+from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    Awaitable,
+    Callable,
+    Generator,
+    Iterator,
+    Sequence,
+)
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Protocol, TypeVar
 
 import grpc.aio
 from pytest import FixtureRequest
@@ -44,6 +53,22 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @fixture(scope="module")
+def _grpc_server(
+    request: FixtureRequest,
+    grpc_addr: str,
+    grpc_interceptors: Sequence[grpc.aio.ServerInterceptor[Any, Any]] | None,
+) -> Generator[grpc.aio.Server, None, None]:
+    max_workers = request.config.getoption("grpc-max-workers")
+    try:
+        max_workers = max(request.module.grpc_max_workers, max_workers)
+    except AttributeError:
+        pass
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        yield grpc.aio.server(pool, interceptors=grpc_interceptors)
+
+
+@fixture(scope="module")
 def grpc_add_to_server() -> SupportsAddMineServicerToServer:
     return add_MineServicer_to_server
 
@@ -60,16 +85,15 @@ async def grpc_server(
     grpc_add_to_server: SupportsAddMineServicerToServer,
     grpc_servicer: AsyncMineServicer,
 ) -> AsyncGenerator[grpc.aio.Server, None]:
-    server = grpc.aio.server()
-    grpc_add_to_server(grpc_servicer, server)
-    server.add_insecure_port(grpc_addr)
+    grpc_add_to_server(grpc_servicer, _grpc_server)
+    _grpc_server.add_insecure_port(grpc_addr)
 
-    await server.start()
+    await _grpc_server.start()
     try:
-        yield server
+        yield _grpc_server
     finally:
-        await server.stop(None)
-        await server.wait_for_termination()
+        await _grpc_server.stop(None)
+        await _grpc_server.wait_for_termination()
 
 
 class AsyncCreateChannel(Protocol):
