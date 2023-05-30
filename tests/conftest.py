@@ -9,8 +9,17 @@ from asyncio import (
     get_running_loop,
     wait,
 )
-from collections.abc import AsyncGenerator, AsyncIterable, Awaitable, Callable, Generator, Iterator
-from typing import Protocol, TypeVar
+from collections.abc import (
+    AsyncGenerator,
+    AsyncIterable,
+    Awaitable,
+    Callable,
+    Generator,
+    Iterator,
+    Sequence,
+)
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Protocol, TypeVar
 
 import grpc.aio
 from pytest import FixtureRequest
@@ -26,7 +35,7 @@ from mine import (
     SupportsAddMineServicerToServer,
     add_MineServicer_to_server,
 )
-from mine_server import MineServicer
+from mine_server import AsyncMineServicer
 
 from . import SupportsMineStub
 
@@ -44,13 +53,47 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @fixture(scope="module")
+def _grpc_server(
+    request: FixtureRequest,
+    grpc_addr: str,
+    grpc_interceptors: Sequence[grpc.aio.ServerInterceptor[Any, Any]] | None,
+) -> Generator[grpc.aio.Server, None, None]:
+    max_workers = request.config.getoption("grpc-max-workers")
+    try:
+        max_workers = max(request.module.grpc_max_workers, max_workers)
+    except AttributeError:
+        pass
+
+    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+        yield grpc.aio.server(pool, interceptors=grpc_interceptors)
+
+
+@fixture(scope="module")
 def grpc_add_to_server() -> SupportsAddMineServicerToServer:
     return add_MineServicer_to_server
 
 
 @fixture(scope="module")
-def grpc_servicer() -> MineServicer:
-    return MineServicer()
+def grpc_servicer() -> AsyncMineServicer:
+    return AsyncMineServicer()
+
+
+@fixture(scope="module")
+async def grpc_server(
+    _grpc_server: grpc.aio.Server,
+    grpc_addr: str,
+    grpc_add_to_server: SupportsAddMineServicerToServer,
+    grpc_servicer: AsyncMineServicer,
+) -> AsyncGenerator[grpc.aio.Server, None]:
+    grpc_add_to_server(grpc_servicer, _grpc_server)
+    _grpc_server.add_insecure_port(grpc_addr)
+
+    await _grpc_server.start()
+    try:
+        yield _grpc_server
+    finally:
+        await _grpc_server.stop(None)
+        await _grpc_server.wait_for_termination()
 
 
 class AsyncCreateChannel(Protocol):
@@ -93,6 +136,12 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
         def __init__(self, channel: grpc.Channel) -> None:
             self.stub = MineStub(channel)
 
+        def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
+            return self.__unary_unary(self.stub.FizzBuzz, request)
+
+        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
+            return self.__unary_stream(self.stub.Count, request)
+
         @staticmethod
         def __unary_unary(
             f: Callable[[T_request], T_response], request: T_request
@@ -126,16 +175,6 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
                     return
                 else:
                     raise NotImplementedError()
-
-            responses = await get_running_loop().run_in_executor(None, lambda: list(f(request)))
-            for response in responses:
-                yield response
-
-        def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
-            return self.__unary_unary(self.stub.FizzBuzz, request)
-
-        def Count(self, request: CountRequest) -> AsyncIterable[CountResponse]:
-            return self.__unary_stream(self.stub.Count, request)
 
     return MineStubWrapper
 
