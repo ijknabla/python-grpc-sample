@@ -47,6 +47,11 @@ async def _test_any_count(stub: SupportsMineStub) -> None:
 
 
 @pytest.mark.asyncio
+async def test_sum(grpc_stub: SupportsMineStub) -> None:
+    await _test_any_sum(grpc_stub)
+
+
+@pytest.mark.asyncio
 async def test_async_sum(grpc_aio_stub: SupportsMineStub) -> None:
     await _test_any_sum(grpc_aio_stub)
 

@@ -3,8 +3,11 @@ from __future__ import annotations
 from asyncio import (
     FIRST_COMPLETED,
     AbstractEventLoop,
+    Event,
     Queue,
+    QueueEmpty,
     create_task,
+    gather,
     get_event_loop_policy,
     get_running_loop,
     wait,
@@ -181,9 +184,33 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
 
         @staticmethod
         async def __stream_unary(
-            f: Callable[[Iterable[T_request]], T_response], request: AsyncIterable[T_request]
+            f: Callable[[Iterable[T_request]], T_response], requests: AsyncIterable[T_request]
         ) -> T_response:
-            raise NotImplementedError()
+            done = Event()
+            q = Queue[T_request]()
+
+            async def put_and_join() -> None:
+                nonlocal done
+                async for request in requests:
+                    await q.put(request)
+                    await q.join()
+                done.set()
+
+            def iter_request() -> Iterator[T_request]:
+                while not done.is_set():
+                    try:
+                        request = q.get_nowait()
+                    except QueueEmpty:
+                        continue
+                    q.task_done()
+                    yield request
+
+            response, _ = await gather(
+                get_running_loop().run_in_executor(None, lambda: f(iter_request())),
+                put_and_join(),
+            )
+
+            return response
 
     return MineStubWrapper
 
