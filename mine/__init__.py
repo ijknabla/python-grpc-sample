@@ -1,4 +1,5 @@
 __all__ = (
+    "AsyncMineServicer",
     "AsyncMineStub",
     "CountRequest",
     "CountResponse",
@@ -8,7 +9,7 @@ __all__ = (
     "MineStub",
     "add_MineServicer_to_server",
 )
-from collections.abc import AsyncIterable, Awaitable, Iterator
+from collections.abc import AsyncIterable, AsyncIterator, Awaitable, Iterator
 from typing import TYPE_CHECKING, Protocol
 
 import grpc.aio
@@ -49,7 +50,23 @@ if TYPE_CHECKING:
         ) -> Iterator[CountResponse]:
             ...
 
+    class AsyncMineServicer(Protocol):
+        async def FizzBuzz(
+            self,
+            request: FizzBuzzRequest,
+            context: grpc.aio.ServicerContext[FizzBuzzRequest, FizzBuzzResponse],
+        ) -> FizzBuzzResponse:
+            ...
+
+        async def Count(
+            self,
+            request: CountRequest,
+            context: grpc.aio.ServicerContext[CountRequest, CountResponse],
+        ) -> AsyncIterator[CountResponse]:
+            ...
+
 else:
+    from ._proto.mine_pb2_grpc import MineServicer as AsyncMineServicer
     from ._proto.mine_pb2_grpc import MineServicer as MineServicer
     from ._proto.mine_pb2_grpc import MineStub as AsyncMineStub
     from ._proto.mine_pb2_grpc import MineStub as MineStub
