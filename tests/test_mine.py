@@ -1,7 +1,6 @@
 import re
 
-from mine.rpc import MineStub
-from mine.types import CountRequest, FizzBuzzRequest
+from mine.pb2 import CountRequest, FizzBuzzRequest, MineStub
 
 
 def test_fizzbuzz(grpc_stub: MineStub) -> None:
