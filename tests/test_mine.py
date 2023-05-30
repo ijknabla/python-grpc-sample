@@ -51,6 +51,11 @@ async def test_count(grpc_stub: MineStub) -> None:
     await _test_any_count(grpc_stub)
 
 
+@pytest.mark.asyncio
+async def test_async_count(grpc_aio_stub: MineStub) -> None:
+    await _test_any_count(grpc_aio_stub)
+
+
 async def _test_any_count(stub: AnyMineStub) -> None:
     n = 3
     request = CountRequest(n=n)
