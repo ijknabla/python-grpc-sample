@@ -13,6 +13,11 @@ async def test_fizzbuzz(grpc_stub: MineStub) -> None:
     await _test_any_fizzbuzz(grpc_stub)
 
 
+@pytest.mark.asyncio
+async def test_async_fizzbuzz(grpc_aio_stub: AsyncMineStub) -> None:
+    await _test_any_fizzbuzz(grpc_aio_stub)
+
+
 async def _test_any_fizzbuzz(stub: AnyMineStub) -> None:
     for i in range(100):
         request = FizzBuzzRequest(i=i)
