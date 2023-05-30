@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmine.proto\x12\x04Mine\"\x1c\n\x0f\x46izzBuzzRequest\x12\t\n\x01i\x18\x01 \x01(\x05\"\x1d\n\x10\x46izzBuzzResponse\x12\t\n\x01s\x18\x01 \x01(\t\"\x1c\n\x0fUnsignedInteger\x12\t\n\x01u\x18\x01 \x01(\x05\x32z\n\x04Mine\x12\x39\n\x08\x46izzBuzz\x12\x15.Mine.FizzBuzzRequest\x1a\x16.Mine.FizzBuzzResponse\x12\x37\n\x05\x43ount\x12\x15.Mine.UnsignedInteger\x1a\x15.Mine.UnsignedInteger0\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nmine.proto\x12\x04Mine\"\x1c\n\x0f\x46izzBuzzRequest\x12\t\n\x01i\x18\x01 \x01(\x05\"\x1d\n\x10\x46izzBuzzResponse\x12\t\n\x01s\x18\x01 \x01(\t\"\x1c\n\x0fUnsignedInteger\x12\t\n\x01u\x18\x01 \x01(\x05\x32\xb1\x01\n\x04Mine\x12\x39\n\x08\x46izzBuzz\x12\x15.Mine.FizzBuzzRequest\x1a\x16.Mine.FizzBuzzResponse\x12\x37\n\x05\x43ount\x12\x15.Mine.UnsignedInteger\x1a\x15.Mine.UnsignedInteger0\x01\x12\x35\n\x03Sum\x12\x15.Mine.UnsignedInteger\x1a\x15.Mine.UnsignedInteger(\x01\x62\x06proto3')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'mine_pb2', globals())
@@ -26,6 +26,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _FIZZBUZZRESPONSE._serialized_end=79
   _UNSIGNEDINTEGER._serialized_start=81
   _UNSIGNEDINTEGER._serialized_end=109
-  _MINE._serialized_start=111
-  _MINE._serialized_end=233
+  _MINE._serialized_start=112
+  _MINE._serialized_end=289
 # @@protoc_insertion_point(module_scope)

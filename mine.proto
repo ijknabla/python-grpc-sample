@@ -7,6 +7,7 @@ service Mine
 {
     rpc FizzBuzz(FizzBuzzRequest) returns (FizzBuzzResponse);
     rpc Count(UnsignedInteger) returns (stream UnsignedInteger);
+    rpc Sum(stream UnsignedInteger) returns (UnsignedInteger);
 }
 
 message FizzBuzzRequest
