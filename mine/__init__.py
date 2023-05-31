@@ -1,25 +1,27 @@
 __all__ = (
     "AsyncMineServicer",
     "AsyncMineStub",
+    "DefaultMineServicer",
     "DefaultMineStub",
     "FizzBuzzRequest",
     "FizzBuzzResponse",
     "MineServicer",
     "MineStub",
     "SupportsAsyncMineStub",
+    "SupportsDefaultMineServicer",
     "SupportsDefaultMineStub",
     "UnsignedInteger",
     "add_MineServicer_to_server",
 )
 
-from collections.abc import AsyncIterable, Iterable
+from collections.abc import AsyncIterable
 from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
 
 from ._proto.mine_pb2 import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger
-from ._proto.mine_pb2_grpc import MineStub, add_MineServicer_to_server
-from ._protocol import SupportsAsyncMineStub, SupportsDefaultMineStub
+from ._proto.mine_pb2_grpc import MineServicer, MineStub, add_MineServicer_to_server
+from ._protocol import SupportsAsyncMineStub, SupportsDefaultMineServicer, SupportsDefaultMineStub
 
 
 class DefaultMineStub(SupportsDefaultMineStub, MineStub):
@@ -36,23 +38,11 @@ class AsyncMineStub(SupportsAsyncMineStub, MineStub):
             ...
 
 
+class DefaultMineServicer(SupportsDefaultMineServicer, MineServicer):
+    ...
+
+
 if TYPE_CHECKING:
-
-    class MineServicer(Protocol):
-        def FizzBuzz(
-            self, request: FizzBuzzRequest, context: grpc.ServicerContext
-        ) -> FizzBuzzResponse:
-            ...
-
-        def Count(
-            self, request: UnsignedInteger, context: grpc.ServicerContext
-        ) -> Iterable[UnsignedInteger]:
-            ...
-
-        def Sum(
-            self, request: Iterable[UnsignedInteger], context: grpc.ServicerContext
-        ) -> UnsignedInteger:
-            ...
 
     class AsyncMineServicer(Protocol):
         async def FizzBuzz(
@@ -77,12 +67,8 @@ if TYPE_CHECKING:
             ...
 
 else:
-    from ._proto.mine_pb2_grpc import MineServicer as _MineServicerBase
 
-    class MineServicer(_MineServicerBase):
-        ...
-
-    class AsyncMineServicer(_MineServicerBase):
+    class AsyncMineServicer(MineServicer):
         ...
 
 
