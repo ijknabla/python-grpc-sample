@@ -1,36 +1,34 @@
 __all__ = (
     "AsyncMineServicer",
     "AsyncMineStub",
+    "DefaultMineStub",
     "FizzBuzzRequest",
     "FizzBuzzResponse",
     "MineServicer",
     "MineStub",
+    "SupportsDefaultMineStub",
     "UnsignedInteger",
     "add_MineServicer_to_server",
 )
 
-from collections.abc import AsyncIterable, Awaitable, Iterable, Iterator
+from collections.abc import AsyncIterable, Awaitable, Iterable
 from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
 
 from ._proto.mine_pb2 import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger
-from ._proto.mine_pb2_grpc import add_MineServicer_to_server
+from ._proto.mine_pb2_grpc import MineStub, add_MineServicer_to_server
+from ._protocol import SupportsDefaultMineStub
 
-if TYPE_CHECKING:
 
-    class MineStub(object):
+class DefaultMineStub(SupportsDefaultMineStub, MineStub):
+    if TYPE_CHECKING:
+
         def __init__(self, channel: grpc.Channel) -> None:
             ...
 
-        def FizzBuzz(self, request: FizzBuzzRequest) -> FizzBuzzResponse:
-            ...
 
-        def Count(self, request: UnsignedInteger) -> Iterator[UnsignedInteger]:
-            ...
-
-        def Sum(self, request: Iterable[UnsignedInteger]) -> UnsignedInteger:
-            ...
+if TYPE_CHECKING:
 
     class AsyncMineStub(object):
         def __init__(self, channel: grpc.aio.Channel) -> None:
@@ -91,9 +89,6 @@ else:
         ...
 
     class AsyncMineServicer(_MineServicerBase):
-        ...
-
-    class MineStub(_MineStubBase):
         ...
 
     class AsyncMineStub(_MineStubBase):

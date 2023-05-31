@@ -31,9 +31,9 @@ from pytest_asyncio import fixture
 
 from mine import (
     AsyncMineStub,
+    DefaultMineStub,
     FizzBuzzRequest,
     FizzBuzzResponse,
-    MineStub,
     SupportsAddMineServicerToServer,
     UnsignedInteger,
     add_MineServicer_to_server,
@@ -134,10 +134,10 @@ async def grpc_aio_channel(
 @fixture(scope="module")
 def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
     class MineStubWrapper:
-        stub: MineStub
+        stub: DefaultMineStub
 
         def __init__(self, channel: grpc.Channel) -> None:
-            self.stub = MineStub(channel)
+            self.stub = DefaultMineStub(channel)
 
         def FizzBuzz(self, request: FizzBuzzRequest) -> Awaitable[FizzBuzzResponse]:
             return self.__unary_unary(self.stub.FizzBuzz, request)
@@ -156,7 +156,7 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
 
         @staticmethod
         async def __unary_stream(
-            f: Callable[[T_request], Iterator[T_response]], request: T_request
+            f: Callable[[T_request], Iterable[T_response]], request: T_request
         ) -> AsyncIterable[T_response]:
             q = Queue[T_response]()
 
