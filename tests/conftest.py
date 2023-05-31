@@ -34,7 +34,7 @@ from mine import (
     DefaultMineStub,
     FizzBuzzRequest,
     FizzBuzzResponse,
-    SupportsAddMineServicerToServer,
+    SupportsAsyncMineServicer,
     SupportsAsyncMineStub,
     UnsignedInteger,
     add_MineServicer_to_server,
@@ -70,8 +70,11 @@ def _grpc_server(
         yield grpc.aio.server(pool, interceptors=grpc_interceptors)
 
 
+AddMineServicerToServer = Callable[[SupportsAsyncMineServicer, grpc.aio.Server], None]
+
+
 @fixture(scope="module")
-def grpc_add_to_server() -> SupportsAddMineServicerToServer:
+def grpc_add_to_server() -> AddMineServicerToServer:
     return add_MineServicer_to_server
 
 
@@ -84,7 +87,7 @@ def grpc_servicer() -> AsyncMineServicer:
 async def grpc_server(
     _grpc_server: grpc.aio.Server,
     grpc_addr: str,
-    grpc_add_to_server: SupportsAddMineServicerToServer,
+    grpc_add_to_server: AddMineServicerToServer,
     grpc_servicer: AsyncMineServicer,
 ) -> AsyncGenerator[grpc.aio.Server, None]:
     grpc_add_to_server(grpc_servicer, _grpc_server)
@@ -219,7 +222,7 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsAsyncMineStub]:
 @fixture(scope="module")
 def grpc_aio_stub_cls(
     grpc_channel: grpc.Channel,
-) -> Callable[[grpc.aio.Channel], SupportsAsyncMineStub]:
+) -> type[AsyncMineStub]:
     return AsyncMineStub
 
 

@@ -15,7 +15,7 @@ __all__ = (
     "add_MineServicer_to_server",
 )
 
-from typing import TYPE_CHECKING, Protocol, overload
+from typing import TYPE_CHECKING
 
 import grpc.aio
 
@@ -49,15 +49,3 @@ class DefaultMineServicer(SupportsDefaultMineServicer, MineServicer):
 
 class AsyncMineServicer(SupportsAsyncMineServicer, MineServicer):
     ...
-
-
-class SupportsAddMineServicerToServer(Protocol):
-    @overload
-    @staticmethod
-    def __call__(servicer: MineServicer, server: grpc.Server) -> None:
-        ...
-
-    @overload
-    @staticmethod
-    def __call__(servicer: AsyncMineServicer, server: grpc.aio.Server) -> None:
-        ...
