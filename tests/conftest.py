@@ -23,7 +23,7 @@ from collections.abc import (
     Sequence,
 )
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Protocol, TypeVar
+from typing import Any, Protocol, TypeVar, cast
 
 import grpc.aio
 from pytest import FixtureRequest
@@ -35,12 +35,11 @@ from mine import (
     FizzBuzzRequest,
     FizzBuzzResponse,
     SupportsAddMineServicerToServer,
+    SupportsAsyncMineStub,
     UnsignedInteger,
     add_MineServicer_to_server,
 )
 from mine_server import AsyncMineServicer
-
-from . import SupportsMineStub
 
 T_request = TypeVar("T_request")
 T_response = TypeVar("T_response")
@@ -132,7 +131,7 @@ async def grpc_aio_channel(
 
 
 @fixture(scope="module")
-def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
+def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsAsyncMineStub]:
     class MineStubWrapper:
         stub: DefaultMineStub
 
@@ -145,8 +144,10 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
         def Count(self, request: UnsignedInteger) -> AsyncIterable[UnsignedInteger]:
             return self.__unary_stream(self.stub.Count, request)
 
-        def Sum(self, request: AsyncIterable[UnsignedInteger]) -> Awaitable[UnsignedInteger]:
-            return self.__stream_unary(self.stub.Sum, request)
+        def Sum(
+            self, request_iterator: AsyncIterable[UnsignedInteger]
+        ) -> Awaitable[UnsignedInteger]:
+            return self.__stream_unary(self.stub.Sum, request_iterator)
 
         @staticmethod
         def __unary_unary(
@@ -212,17 +213,19 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsMineStub]:
 
             return response
 
-    return MineStubWrapper
+    return cast(type[SupportsAsyncMineStub], MineStubWrapper)
 
 
 @fixture(scope="module")
-def grpc_aio_stub_cls(grpc_channel: grpc.Channel) -> Callable[[grpc.aio.Channel], SupportsMineStub]:
+def grpc_aio_stub_cls(
+    grpc_channel: grpc.Channel,
+) -> Callable[[grpc.aio.Channel], SupportsAsyncMineStub]:
     return AsyncMineStub
 
 
 @fixture(scope="module")
 async def grpc_aio_stub(
-    grpc_aio_stub_cls: Callable[[grpc.aio.Channel], SupportsMineStub],
+    grpc_aio_stub_cls: Callable[[grpc.aio.Channel], SupportsAsyncMineStub],
     grpc_aio_channel: grpc.aio.Channel,
-) -> AsyncGenerator[SupportsMineStub, None]:
+) -> AsyncGenerator[SupportsAsyncMineStub, None]:
     yield grpc_aio_stub_cls(grpc_aio_channel)
