@@ -3,22 +3,20 @@ from collections.abc import AsyncIterator
 
 import pytest
 
-from mine import FizzBuzzRequest, UnsignedInteger
-
-from . import SupportsMineStub
+from mine import FizzBuzzRequest, SupportsAsyncMineStub, UnsignedInteger
 
 
 @pytest.mark.asyncio
-async def test_fizzbuzz(grpc_stub: SupportsMineStub) -> None:
+async def test_fizzbuzz(grpc_stub: SupportsAsyncMineStub) -> None:
     await _test_any_fizzbuzz(grpc_stub)
 
 
 @pytest.mark.asyncio
-async def test_async_fizzbuzz(grpc_aio_stub: SupportsMineStub) -> None:
+async def test_async_fizzbuzz(grpc_aio_stub: SupportsAsyncMineStub) -> None:
     await _test_any_fizzbuzz(grpc_aio_stub)
 
 
-async def _test_any_fizzbuzz(stub: SupportsMineStub) -> None:
+async def _test_any_fizzbuzz(stub: SupportsAsyncMineStub) -> None:
     for i in range(100):
         request = FizzBuzzRequest(i=i)
         response = await stub.FizzBuzz(request)
@@ -30,16 +28,16 @@ async def _test_any_fizzbuzz(stub: SupportsMineStub) -> None:
 
 
 @pytest.mark.asyncio
-async def test_count(grpc_stub: SupportsMineStub) -> None:
+async def test_count(grpc_stub: SupportsAsyncMineStub) -> None:
     await _test_any_count(grpc_stub)
 
 
 @pytest.mark.asyncio
-async def test_async_count(grpc_aio_stub: SupportsMineStub) -> None:
+async def test_async_count(grpc_aio_stub: SupportsAsyncMineStub) -> None:
     await _test_any_count(grpc_aio_stub)
 
 
-async def _test_any_count(stub: SupportsMineStub) -> None:
+async def _test_any_count(stub: SupportsAsyncMineStub) -> None:
     u = 3
     request = UnsignedInteger(u=u)
     responses = [r async for r in stub.Count(request)]
@@ -47,16 +45,16 @@ async def _test_any_count(stub: SupportsMineStub) -> None:
 
 
 @pytest.mark.asyncio
-async def test_sum(grpc_stub: SupportsMineStub) -> None:
+async def test_sum(grpc_stub: SupportsAsyncMineStub) -> None:
     await _test_any_sum(grpc_stub)
 
 
 @pytest.mark.asyncio
-async def test_async_sum(grpc_aio_stub: SupportsMineStub) -> None:
+async def test_async_sum(grpc_aio_stub: SupportsAsyncMineStub) -> None:
     await _test_any_sum(grpc_aio_stub)
 
 
-async def _test_any_sum(stub: SupportsMineStub) -> None:
+async def _test_any_sum(stub: SupportsAsyncMineStub) -> None:
     us = range(100)
 
     async def values_iterator() -> AsyncIterator[UnsignedInteger]:

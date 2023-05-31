@@ -5,9 +5,8 @@ from contextlib import contextmanager
 import grpc
 
 from mine import AsyncMineServicer as _AsyncMineServicerBase
-from mine import FizzBuzzRequest, FizzBuzzResponse
-from mine import MineServicer as _MineServicerBase
-from mine import UnsignedInteger, add_MineServicer_to_server
+from mine import DefaultMineServicer as _MineServicerBase
+from mine import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger, add_MineServicer_to_server
 
 
 class MineServicer(_MineServicerBase):
