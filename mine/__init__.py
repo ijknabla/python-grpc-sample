@@ -7,6 +7,7 @@ __all__ = (
     "FizzBuzzResponse",
     "MineServicer",
     "MineStub",
+    "SupportsAsyncMineServicer",
     "SupportsAsyncMineStub",
     "SupportsDefaultMineServicer",
     "SupportsDefaultMineStub",
@@ -14,14 +15,18 @@ __all__ = (
     "add_MineServicer_to_server",
 )
 
-from collections.abc import AsyncIterable
 from typing import TYPE_CHECKING, Protocol, overload
 
 import grpc.aio
 
 from ._proto.mine_pb2 import FizzBuzzRequest, FizzBuzzResponse, UnsignedInteger
 from ._proto.mine_pb2_grpc import MineServicer, MineStub, add_MineServicer_to_server
-from ._protocol import SupportsAsyncMineStub, SupportsDefaultMineServicer, SupportsDefaultMineStub
+from ._protocol import (
+    SupportsAsyncMineServicer,
+    SupportsAsyncMineStub,
+    SupportsDefaultMineServicer,
+    SupportsDefaultMineStub,
+)
 
 
 class DefaultMineStub(SupportsDefaultMineStub, MineStub):
@@ -42,34 +47,8 @@ class DefaultMineServicer(SupportsDefaultMineServicer, MineServicer):
     ...
 
 
-if TYPE_CHECKING:
-
-    class AsyncMineServicer(Protocol):
-        async def FizzBuzz(
-            self,
-            request: FizzBuzzRequest,
-            context: grpc.aio.ServicerContext[FizzBuzzRequest, FizzBuzzResponse],
-        ) -> FizzBuzzResponse:
-            ...
-
-        def Count(
-            self,
-            request: UnsignedInteger,
-            context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
-        ) -> AsyncIterable[UnsignedInteger]:
-            ...
-
-        async def Sum(
-            self,
-            request: AsyncIterable[UnsignedInteger],
-            context: grpc.aio.ServicerContext[UnsignedInteger, UnsignedInteger],
-        ) -> UnsignedInteger:
-            ...
-
-else:
-
-    class AsyncMineServicer(MineServicer):
-        ...
+class AsyncMineServicer(SupportsAsyncMineServicer, MineServicer):
+    ...
 
 
 class SupportsAddMineServicerToServer(Protocol):
