@@ -22,5 +22,5 @@ message FizzBuzzResponse
 
 message UnsignedInteger
 {
-    int32 u = 1;
+    uint32 u = 1;
 }
