@@ -9,9 +9,9 @@ class MineServicer(object): ...
 
 @_overload
 def add_MineServicer_to_server(
-    servicer: _protocol.SupportsAsyncMineServicer, server: grpc.aio.Server
+    servicer: _protocol.SupportsDefaultMineServicer, server: grpc.Server
 ) -> None: ...
 @_overload
 def add_MineServicer_to_server(
-    servicer: _protocol.SupportsDefaultMineServicer, server: grpc.Server
+    servicer: _protocol.SupportsAsyncMineServicer, server: grpc.aio.Server
 ) -> None: ...
