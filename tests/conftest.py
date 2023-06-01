@@ -23,7 +23,7 @@ from collections.abc import (
     Sequence,
 )
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Protocol, TypeVar, cast
+from typing import Any, Protocol, TypeVar
 
 import grpc.aio
 from pytest import FixtureRequest
@@ -135,7 +135,7 @@ async def grpc_aio_channel(
 
 @fixture(scope="module")
 def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsAsyncMineStub]:
-    class MineStubWrapper:
+    class MineStubWrapper(SupportsAsyncMineStub):
         stub: DefaultMineStub
 
         def __init__(self, channel: grpc.Channel) -> None:
@@ -216,7 +216,7 @@ def grpc_stub_cls(grpc_channel: grpc.Channel) -> type[SupportsAsyncMineStub]:
 
             return response
 
-    return cast(type[SupportsAsyncMineStub], MineStubWrapper)
+    return MineStubWrapper
 
 
 @fixture(scope="module")
